@@ -14,6 +14,3 @@ cd alpha-shop-vue
 npm run serve
 ```
 4. 根據終端機提供的網址進行連線~
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
