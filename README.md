@@ -1,5 +1,5 @@
 # alpha-shop-vue
-
+![image]()
 ## Project setup
 1. clone 此專案
 ```
