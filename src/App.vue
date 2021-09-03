@@ -7,8 +7,8 @@
           <Stepper :currentPage="currentPage" :prevPage="prevPage" />
           <router-view
             :initial-user="user"
-            @deliveryStandard="deliveryStandard"
-            @deliveryDhl="deliveryDhl"
+            @deliveryStandard="handleDeliveryStandard"
+            @deliveryDhl="handleDeliveryDhl"
             @sentPageOne="sentPageOne"
             @sentPageTwo="sentPageTwo"
             @sentPageThree="sentPageThree"
@@ -28,14 +28,14 @@
           <div class="btn-container">
             <div class="btn-content" id="btn-control">
               <button
-                class="btn btn-prev"
+                class=" btn-prev"
                 @click.prevent.stop="handlePrevPage"
                 v-show="currentPage > 1"
               >
                 上一步
               </button>
               <button
-                class="btn btn-next"
+                class=" btn-next"
                 @click.prevent.stop="handleNextPage"
                 v-if="currentPage < 3"
               >
@@ -88,7 +88,7 @@ import "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Stepper from "./components/Stepper";
 import Cart from "./components/Cart";
-
+import { saveData } from "./utils/mixins";
 const dummyData = [
   {
     id: 1,
@@ -109,6 +109,7 @@ const dummyData = [
 ];
 
 export default {
+  mixins: [saveData],
   name: "App",
   components: {
     Stepper,
@@ -140,7 +141,6 @@ export default {
   created() {
     this.fetchCart();
     this.fetchUser();
-    // ??
     this.totalAmount();
   },
   methods: {
@@ -151,19 +151,22 @@ export default {
       }
     },
     fetchCart() {
-      const cartData = JSON.parse(localStorage.getItem("cartData"))||dummyData;
-      this.cart = cartData
+      const cartData =
+        JSON.parse(localStorage.getItem("cartData")) || dummyData;
+      this.cart = cartData;
     },
     handleNextPage() {
       const nextPage = this.currentPage + 1;
       this.currentPage += 1;
       this.prevPage += 1;
+      this.saveDataToLocal();
       this.$router.push("/alphashop/" + nextPage);
     },
     handlePrevPage() {
       const prevPage = this.currentPage - 1;
       this.currentPage -= 1;
       this.prevPage -= 1;
+      this.saveDataToLocal();
       this.$router.push("/alphashop/" + prevPage);
     },
     handleAmountAdd(id) {
@@ -171,8 +174,7 @@ export default {
         if (item.id === id) {
           item.amount += 1;
           this.totalAmount();
-          localStorage.setItem('cartData',JSON.stringify(this.cart))
-          
+          this.saveDataToLocal();
         }
         return item;
       });
@@ -182,30 +184,31 @@ export default {
         if (item.id === id && item.amount > 1) {
           item.amount -= 1;
           this.totalAmount();
-          localStorage.setItem('cartData',JSON.stringify(this.cart))
+          this.saveDataToLocal();
         }
         return item;
       });
     },
-    deliveryStandard() {
+    handleDeliveryStandard() {
       this.user.shippingFee = 0;
       this.delivery = "免費";
-      localStorage.setItem("localData", JSON.stringify(this.user));
+      this.saveDataToLocal();
       this.totalAmount();
     },
-    deliveryDhl() {
+    handleDeliveryDhl() {
       this.user.shippingFee = 500;
       this.delivery = 500;
-      localStorage.setItem("localData", JSON.stringify(this.user));
+      this.saveDataToLocal();
       this.totalAmount();
     },
     totalAmount() {
       let itemsPrice = 0;
       let deliveryPrice = 0;
-      if (isNaN(Number(this.delivery))) {
+      if (this.user.shippingFee === 0) {
         deliveryPrice = 0;
         this.delivery = "免費";
       } else {
+        this.delivery = 500
         deliveryPrice = this.delivery;
       }
       this.cart.map((item) => {
@@ -227,13 +230,14 @@ export default {
     },
     handleDataChange(userData) {
       this.user = userData;
-      localStorage.setItem("localData", JSON.stringify(userData));
+      this.saveDataToLocal();
     },
     handleSubmit() {
       this.user = {
         ...this.user,
         totalPrice: this.total,
       };
+      this.saveDataToLocal();
     },
   },
 };

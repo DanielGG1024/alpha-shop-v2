@@ -14,7 +14,7 @@
                     id="standard"
                     name="delivery"
                     value="0"
-                    @click="handleDeliveryStandard"
+                    @click="clickDeliveryStandard"
                     v-model="initialUser.shippingFee"
                   />
                   <div class="">
@@ -33,7 +33,7 @@
                     id="dhl"
                     name="delivery"
                     value="500"
-                    @click="handleDeliveryDhl"
+                    @click="clickDeliveryDhl"
                     v-model="initialUser.shippingFee"
                   />
                   <div>
@@ -73,10 +73,10 @@ export default {
     fetchUser() {
       this.user = this.initialUser;
     },
-    handleDeliveryStandard() {
+    clickDeliveryStandard() {
       this.$emit("deliveryStandard");
     },
-    handleDeliveryDhl() {
+    clickDeliveryDhl() {
       this.$emit("deliveryDhl");
     },
     handlePageTwo() {
